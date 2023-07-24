@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 using System;
 using System.Text;
 using Shopping.Helpers;
+using Shopping.Services;
 
 namespace Shopping.Controllers
 {
@@ -15,23 +16,22 @@ namespace Shopping.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUserServices _userServices;
 
-        public UsersController(ApplicationDbContext context)
+        public UsersController(IUserServices userServices)
         {
-            _context = context;
+            _userServices = userServices;
         }
 
         
         [HttpPost("SignUp")]
         public async Task<IActionResult> SignUp(SignUpDto dto)
         {
-            
-            if (await _context.Users.AnyAsync(x => x.UserName == dto.UserName))
+            if (await _userServices.CheckTheUserName(dto.UserName))
             {
                 return BadRequest(error: $"This username is already taken.");
             }
-            if (await _context.Users.AnyAsync(x => x.Email == dto.Email))
+            if (await _userServices.CheckTheEmail(dto.Email))
             {
                 return BadRequest(error: $"User is already Exist");
             }
@@ -43,19 +43,14 @@ namespace Shopping.Controllers
                 Password = HashingService.HashPassword(dto.Password)
             };
 
-           
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
- 
+            await _userServices.SignUp(user);
             return Ok(user);
         }
 
         [HttpPost("LogIn")]
         public async Task<IActionResult> LogIn(LogInDto dto)
         {
-            var hash = HashingService.HashPassword(dto.Password);
-            var user = await _context.Users.SingleOrDefaultAsync(x => x.Password == hash && x.Email == dto.Email);
-       
+            var user = await _userServices.GetByPasswordAndEmail(dto.Email, dto.Password);
 
             if (user == null)
             {
@@ -66,12 +61,11 @@ namespace Shopping.Controllers
         }
 
         [HttpPut("ResetPassword")]
-        public async Task<IActionResult> ResetPassword(ResetPasswordDtocs dto)
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
         {
+            var user = await _userServices.GetByPasswordAndEmail(dto.Email, dto.Password);
 
-            var user = await _context.Users.SingleOrDefaultAsync(x => x.Email == dto.Email && x.Password == HashingService.HashPassword(dto.Password));
-
-            if (!await _context.Users.AnyAsync(x => x.Email == dto.Email))
+            if (!await _userServices.CheckTheEmail(dto.Email))
             {
                 return BadRequest(error: $"No User Exist with this Email!");
             }
@@ -82,19 +76,16 @@ namespace Shopping.Controllers
             }
 
              user.Password = HashingService.HashPassword(dto.NewPassword);
-             _context.Users.Update(user);
-             await _context.SaveChangesAsync();
+             await _userServices.ResetPassword(user);
 
             return Ok("The Password Resetted Successfully");
-
-
         }
 
         [HttpPut("ForgetPassword")]
         public async Task<IActionResult> ForgetPassword(ForgetPasswordDto dto)
         {
-            var user = await _context.Users.SingleOrDefaultAsync(x => x.Email == dto.Email && x.UserName == dto.UserName);
-            if(!await _context.Users.AnyAsync(x => x.UserName == dto.UserName))
+            var user = await _userServices.GetByUserNameAndEmail(dto.Email, dto.UserName);
+            if(!await _userServices.CheckTheUserName(dto.UserName))
             {
                 return BadRequest(error: $"Wrong UserName!");
             }
@@ -103,13 +94,9 @@ namespace Shopping.Controllers
                 return BadRequest(error: $"No User Exist with this Email!");
             }
 
-            string DefaultPassword = how to get value from appsetting?;
+            await _userServices.ForgetPassword(user);
 
-            user.Password = HashingService.HashPassword(DefaultPassword);
-
-            await _context.SaveChangesAsync();
-
-            return Ok();
+            return Ok(user);
         }
 
     }

@@ -2,7 +2,7 @@
 
 namespace Shopping.Dtos
 {
-    public class ResetPasswordDtocs
+    public class ResetPasswordDto
     {
         [EmailAddress]
         public string Email { get; set; }
