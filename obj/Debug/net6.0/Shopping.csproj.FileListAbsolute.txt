@@ -81,3 +81,5 @@ G:\WEB DEVELOPMENT\Shopping\obj\Debug\net6.0\Shopping.pdb
 G:\WEB DEVELOPMENT\Shopping\obj\Debug\net6.0\Shopping.genruntimeconfig.cache
 G:\WEB DEVELOPMENT\Shopping\obj\Debug\net6.0\ref\Shopping.dll
 G:\WEB DEVELOPMENT\Shopping\bin\Debug\net6.0\Microsoft.AspNetCore.Authentication.Google.dll
+G:\WEB DEVELOPMENT\Shopping\bin\Debug\net6.0\AutoMapper.dll
+G:\WEB DEVELOPMENT\Shopping\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll

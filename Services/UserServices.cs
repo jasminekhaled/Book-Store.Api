@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Shopping.Dtos;
 using Shopping.Helpers;
 using Shopping.Models;
@@ -8,10 +9,12 @@ namespace Shopping.Services
     public class UserServices : IUserServices
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public UserServices(ApplicationDbContext context)
+        public UserServices(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<User> SignUp(SignUpDto dto)
@@ -25,12 +28,8 @@ namespace Shopping.Services
                 throw new Exception($"User is already Exist.");
             }
 
-            var user = new User
-            {
-                UserName = dto.UserName,
-                Email = dto.Email,
-                Password = HashingService.HashPassword(dto.Password)
-            };
+            var user = _mapper.Map<User>(dto);
+  
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
