@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Shopping.Dtos;
 using Shopping.Helpers;
 using Shopping.Models;
 
@@ -13,8 +14,23 @@ namespace Shopping.Services
             _context = context;
         }
 
-        public async Task<User> SignUp(User user)
+        public async Task<User> SignUp(SignUpDto dto)
         {
+            if (await _context.Users.AnyAsync(x => x.UserName == dto.UserName))
+            {
+                throw new Exception($"This username is already taken.");
+            }
+            if (await _context.Users.AnyAsync(x => x.Email == dto.Email))
+            {
+                throw new Exception($"User is already Exist.");
+            }
+
+            var user = new User
+            {
+                UserName = dto.UserName,
+                Email = dto.Email,
+                Password = HashingService.HashPassword(dto.Password)
+            };
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
@@ -60,5 +76,9 @@ namespace Shopping.Services
         {
            return await _context.Users.SingleOrDefaultAsync(x => x.Email == email && x.UserName == userName);
         }
+
+       
+
+        
     }
 }

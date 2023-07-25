@@ -27,24 +27,8 @@ namespace Shopping.Controllers
         [HttpPost("SignUp")]
         public async Task<IActionResult> SignUp(SignUpDto dto)
         {
-            if (await _userServices.CheckTheUserName(dto.UserName))
-            {
-                return BadRequest(error: $"This username is already taken.");
-            }
-            if (await _userServices.CheckTheEmail(dto.Email))
-            {
-                return BadRequest(error: $"User is already Exist");
-            }
-
-            var user = new User
-            {
-                UserName = dto.UserName,
-                Email = dto.Email,
-                Password = HashingService.HashPassword(dto.Password)
-            };
-
-            await _userServices.SignUp(user);
-            return Ok(user);
+            await _userServices.SignUp(dto);
+            return Ok(value: $"Signed Up successfully");
         }
 
         [HttpPost("LogIn")]

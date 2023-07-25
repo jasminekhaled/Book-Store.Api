@@ -1,10 +1,11 @@
-﻿using Shopping.Models;
+﻿using Shopping.Dtos;
+using Shopping.Models;
 
 namespace Shopping.Services
 {
     public interface IUserServices
     {
-        Task<User> SignUp(User user);
+        Task<User> SignUp(SignUpDto dto);
         Task<User> ResetPassword(User user);
         Task<User> ForgetPassword(User user);
         Task<bool> CheckTheUserName(string userName);
