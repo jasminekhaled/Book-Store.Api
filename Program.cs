@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Shopping.Models;
+using Shopping.Context;
 using Shopping.Services;
 
 var builder = WebApplication.CreateBuilder(args);

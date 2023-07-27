@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Shopping.Dtos
+namespace Shopping.Dtos.RequestDtos
 {
-    public class ForgetPasswordDto
+    public class SignUpDto
     {
+
         [MaxLength(length: 30)]
         [MinLength(length: 5)]
         public string UserName { get; set; }
@@ -12,6 +13,7 @@ namespace Shopping.Dtos
         public string Email { get; set; }
 
 
-        
+        [MinLength(length: 10)]
+        public string Password { get; set; }
     }
 }

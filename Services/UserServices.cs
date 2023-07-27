@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Shopping.Dtos;
+using Shopping.Context;
+using Shopping.Dtos.RequestDtos;
 using Shopping.Helpers;
 using Shopping.Models;
 
@@ -35,16 +36,50 @@ namespace Shopping.Services
 
             return (user);
         }
-
-        public async Task<User> ForgetPassword(User user)
+        public async Task LogIn(LogInDto dto)
         {
-            _context.Users.Update(user);
-            await _context.SaveChangesAsync();
-            return (user);
+            var user = await _context.Users.SingleOrDefaultAsync(x => x.Email == dto.Email && x.Password == HashingService.HashPassword(dto.Password));
+
+            if (user == null)
+            {
+                throw new Exception( $"Email or Password is wrong");
+            }
+            return ;
         }
 
-        public async Task<User> ResetPassword(User user)
+        public async Task ForgetPassword(ForgetPasswordDto dto)
         {
+            var user = await _context.Users.SingleOrDefaultAsync(x => x.Email == dto.Email && x.UserName == dto.UserName);
+            if (!await _context.Users.AnyAsync(x => x.UserName == dto.UserName))
+            {
+                throw new Exception($"Wrong UserName!");
+            }
+            if (user == null)
+            {
+                throw new Exception($"No User Exist with this Email!");
+            }
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            return ;
+        }
+
+        public async Task ResetPassword(ResetPasswordDto dto)
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(x => x.Email == dto.Email && x.Password == HashingService.HashPassword(dto.Password));
+
+            if (!await _context.Users.AnyAsync(x => x.Email == dto.Email))
+            {
+                throw new Exception($"No User Exist with this Email!");
+            }
+
+            if (user == null)
+            {
+                throw new Exception($"Wrong Password");
+            }
+
+            user.Password = HashingService.HashPassword(dto.NewPassword);
+         
             var configuration = new ConfigurationBuilder()
            .AddJsonFile("appsettings.json")
            .Build();
@@ -54,30 +89,10 @@ namespace Shopping.Services
             user.Password = HashingService.HashPassword(DefaultPassword);
 
             await _context.SaveChangesAsync();
-            return (user);
-        }
-
-        public async Task<bool> CheckTheUserName(string userName)
-        {
-            return await _context.Users.AnyAsync(x => x.UserName == userName);
-        }
-        public async Task<bool> CheckTheEmail(string email)
-        {
-            return await _context.Users.AnyAsync(x => x.Email == email);
-        }
-
-        public async Task<User> GetByPasswordAndEmail(string email, string password)
-        {
-           return await _context.Users.SingleOrDefaultAsync(x => x.Email == email && x.Password == HashingService.HashPassword(password));
-        }
-
-        public async Task<User> GetByUserNameAndEmail(string email, string userName)
-        {
-           return await _context.Users.SingleOrDefaultAsync(x => x.Email == email && x.UserName == userName);
+            return ;
         }
 
        
-
         
     }
 }
