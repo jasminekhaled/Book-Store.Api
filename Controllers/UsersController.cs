@@ -28,8 +28,10 @@ namespace Shopping.Controllers
         [HttpPost("SignUp")]
         public async Task<IActionResult> SignUp(SignUpDto dto)
         {
-            await _userServices.SignUp(dto);
-            return Ok(value: $"Signed Up successfully");
+            var result = await _userServices.SignUp(dto);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
         }
 
 
@@ -37,8 +39,10 @@ namespace Shopping.Controllers
         [HttpPost("LogIn")]
         public async Task<IActionResult> LogIn(LogInDto dto)
         {
-            await _userServices.LogIn(dto);
-            return Ok("Logged in successfully");
+            var result = await _userServices.LogIn(dto);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
         }
 
 
@@ -46,8 +50,10 @@ namespace Shopping.Controllers
         [HttpPut("ResetPassword")]
         public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
         {
-            await _userServices.ResetPassword(dto);
-            return Ok("The Password Resetted Successfully");
+            var result = await _userServices.ResetPassword(dto);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
         }
 
 
@@ -55,8 +61,10 @@ namespace Shopping.Controllers
         [HttpPut("ForgetPassword")]
         public async Task<IActionResult> ForgetPassword(ForgetPasswordDto dto)
         {
-            await _userServices.ForgetPassword(dto);
-            return Ok();
+            var result = await _userServices.ForgetPassword(dto);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
         }
 
     }

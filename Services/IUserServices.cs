@@ -1,14 +1,15 @@
 ﻿using Shopping.Dtos.RequestDtos;
+using Shopping.Dtos.ResponseDtos;
 using Shopping.Models;
 
 namespace Shopping.Services
 {
     public interface IUserServices
     {
-        Task<User> SignUp(SignUpDto dto);
-        Task LogIn(LogInDto dto);
-        Task ResetPassword(ResetPasswordDto dto);
-        Task ForgetPassword(ForgetPasswordDto dto);
+        Task<GeneralResponse<UserDto>> SignUp(SignUpDto dto);
+        Task<GeneralResponse<UserDto>> LogIn(LogInDto dto);
+        Task<GeneralResponse<UserDto>> ResetPassword(ResetPasswordDto dto);
+        Task<GeneralResponse<UserDto>> ForgetPassword(ForgetPasswordDto dto);
        
 
     }

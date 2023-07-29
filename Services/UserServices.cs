@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shopping.Context;
 using Shopping.Dtos.RequestDtos;
+using Shopping.Dtos.ResponseDtos;
 using Shopping.Helpers;
 using Shopping.Models;
 
@@ -18,79 +19,182 @@ namespace Shopping.Services
             _mapper = mapper;
         }
 
-        public async Task<User> SignUp(SignUpDto dto)
+        public async Task<GeneralResponse<UserDto>> SignUp(SignUpDto dto)
         {
-            if (await _context.Users.AnyAsync(x => x.UserName == dto.UserName))
+            try
             {
-                throw new Exception($"This username is already taken.");
+                if (await _context.Users.AnyAsync(x => x.UserName == dto.UserName))
+                {
+                    return new GeneralResponse<UserDto>
+                    {
+                        IsSuccess = false,
+                        Message = "This username is already taken."
+                    }; 
+                }
+                if (await _context.Users.AnyAsync(x => x.Email == dto.Email))
+                {
+                    return new GeneralResponse<UserDto>
+                    {
+                        IsSuccess = false,
+                        Message = "User is already Exist."
+                    };
+                }
+
+                var user = _mapper.Map<User>(dto);
+                user.Password = HashingService.HashPassword(dto.Password);
+
+
+                await _context.Users.AddAsync(user);
+                await _context.SaveChangesAsync();
+
+                return new GeneralResponse<UserDto>
+                {
+                    IsSuccess = true,
+                    Message = "Signed Up Successfully",
+                    Data = _mapper.Map<UserDto>(dto)
+                };
             }
-            if (await _context.Users.AnyAsync(x => x.Email == dto.Email))
+            catch(Exception ex)
             {
-                throw new Exception($"User is already Exist.");
+                return new GeneralResponse<UserDto>
+                {
+                    IsSuccess = false,
+                    Message = "Something went wrong",
+                    Error = ex
+                };
             }
-
-            var user = _mapper.Map<User>(dto);
-  
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
-
-            return (user);
+           
         }
-        public async Task LogIn(LogInDto dto)
+
+        public async Task<GeneralResponse<UserDto>> LogIn(LogInDto dto)
         {
-            var user = await _context.Users.SingleOrDefaultAsync(x => x.Email == dto.Email && x.Password == HashingService.HashPassword(dto.Password));
-
-            if (user == null)
+            try 
             {
-                throw new Exception( $"Email or Password is wrong");
+                var user = await _context.Users.SingleOrDefaultAsync(x => x.Email == dto.Email && x.Password == HashingService.HashPassword(dto.Password));
+
+                if (user == null)
+                {
+                    return new GeneralResponse<UserDto>
+                    {
+                        IsSuccess = false,
+                        Message = "Email or Password is wrong."
+                    };
+                }
+                return new GeneralResponse<UserDto>
+                {
+                    IsSuccess = true,
+                    Message = "Logged In Successfully",
+                };
             }
-            return ;
+            catch (Exception ex)
+            {
+                return new GeneralResponse<UserDto>
+                {
+                    IsSuccess = false,
+                    Message = "Something went wrong",
+                    Error = ex
+                };
+            }
         }
 
-        public async Task ForgetPassword(ForgetPasswordDto dto)
+        public async Task<GeneralResponse<UserDto>> ResetPassword(ResetPasswordDto dto)
         {
-            var user = await _context.Users.SingleOrDefaultAsync(x => x.Email == dto.Email && x.UserName == dto.UserName);
-            if (!await _context.Users.AnyAsync(x => x.UserName == dto.UserName))
+            try
             {
-                throw new Exception($"Wrong UserName!");
+                var user = await _context.Users.SingleOrDefaultAsync(x => x.Email == dto.Email && x.Password == HashingService.HashPassword(dto.Password));
+
+                if (!await _context.Users.AnyAsync(x => x.Email == dto.Email))
+                {
+                    return new GeneralResponse<UserDto>
+                    {
+                        IsSuccess = false,
+                        Message = "No User Exist with this Email!"
+                    };
+                }
+
+                if (user == null)
+                {
+                    return new GeneralResponse<UserDto>
+                    {
+                        IsSuccess = false,
+                        Message = "Wrong Password."
+                    };
+                }
+
+                user.Password = HashingService.HashPassword(dto.NewPassword);
+
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+
+                return new GeneralResponse<UserDto>
+                {
+                    IsSuccess = true,
+                    Message = "Password is resetted successfully",
+                };
             }
-            if (user == null)
+            catch (Exception ex)
             {
-                throw new Exception($"No User Exist with this Email!");
+                return new GeneralResponse<UserDto>
+                {
+                    IsSuccess = false,
+                    Message = "Something went wrong",
+                    Error = ex
+                };
             }
 
-            _context.Users.Update(user);
-            await _context.SaveChangesAsync();
-            return ;
         }
 
-        public async Task ResetPassword(ResetPasswordDto dto)
+        public async Task<GeneralResponse<UserDto>> ForgetPassword(ForgetPasswordDto dto)
         {
-            var user = await _context.Users.SingleOrDefaultAsync(x => x.Email == dto.Email && x.Password == HashingService.HashPassword(dto.Password));
-
-            if (!await _context.Users.AnyAsync(x => x.Email == dto.Email))
+            try 
             {
-                throw new Exception($"No User Exist with this Email!");
+                var user = await _context.Users.SingleOrDefaultAsync(x => x.Email == dto.Email && x.UserName == dto.UserName);
+                if (!await _context.Users.AnyAsync(x => x.UserName == dto.UserName))
+                {
+                    return new GeneralResponse<UserDto>
+                    {
+                        IsSuccess = false,
+                        Message = "Wrong UserName!"
+                    };
+                }
+                if (user == null)
+                {
+                    return new GeneralResponse<UserDto>
+                    {
+                        IsSuccess = false,
+                        Message = "No User Exist with this Email!"
+                    };
+                }
+
+                var configuration = new ConfigurationBuilder()
+               .AddJsonFile("appsettings.json")
+               .Build();
+
+                string DefaultPassword = configuration.GetValue<string>("DefaultPassword");
+
+                user.Password = HashingService.HashPassword(DefaultPassword);
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+
+                return new GeneralResponse<UserDto>
+                {
+                    IsSuccess = true,
+                    Message = "User has a temperory Default Password",
+                };
+            }
+            catch (Exception ex)
+            {
+                return new GeneralResponse<UserDto>
+                {
+                    IsSuccess = false,
+                    Message = "Something went wrong",
+                    Error = ex
+                };
             }
 
-            if (user == null)
-            {
-                throw new Exception($"Wrong Password");
-            }
-
-            user.Password = HashingService.HashPassword(dto.NewPassword);
-         
-            var configuration = new ConfigurationBuilder()
-           .AddJsonFile("appsettings.json")
-           .Build();
-
-            string DefaultPassword = configuration.GetValue<string>("DefaultPassword");
-
-            user.Password = HashingService.HashPassword(DefaultPassword);
-
-            await _context.SaveChangesAsync();
-            return ;
         }
+
+
 
        
         
