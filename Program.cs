@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shopping.Context;
-using Shopping.Services;
+using Shopping.Services.Auth;
+using Shopping.Services.Book;
 
 var builder = WebApplication.CreateBuilder(args);
 var ConnectionString = builder.Configuration.GetConnectionString(name: "DefaultConnection");
@@ -12,7 +13,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(ConnectionString));
-builder.Services.AddScoped<IUserServices, UserServices>();
+builder.Services.AddScoped<IAuthServices, AuthServices>();
+builder.Services.AddScoped<IBookServices, BookServices>();
 builder.Services.AddAutoMapper(typeof(Program));
 var app = builder.Build();
 

@@ -7,20 +7,20 @@ using System.Security.Cryptography;
 using System;
 using System.Text;
 using Shopping.Helpers;
-using Shopping.Services;
 using Shopping.Dtos.RequestDtos;
+using Shopping.Services.Auth;
 
 namespace Shopping.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class AuthController : ControllerBase
     {
-        private readonly IUserServices _userServices;
+        private readonly IAuthServices _authServices;
 
-        public UsersController(IUserServices userServices)
+        public AuthController(IAuthServices authServices)
         {
-            _userServices = userServices;
+            _authServices = authServices;
         }
 
 
@@ -28,7 +28,7 @@ namespace Shopping.Controllers
         [HttpPost("SignUp")]
         public async Task<IActionResult> SignUp(SignUpDto dto)
         {
-            var result = await _userServices.SignUp(dto);
+            var result = await _authServices.SignUp(dto);
             if (result.IsSuccess)
                 return Ok(result);
             return BadRequest(result);
@@ -39,7 +39,7 @@ namespace Shopping.Controllers
         [HttpPost("LogIn")]
         public async Task<IActionResult> LogIn(LogInDto dto)
         {
-            var result = await _userServices.LogIn(dto);
+            var result = await _authServices.LogIn(dto);
             if (result.IsSuccess)
                 return Ok(result);
             return BadRequest(result);
@@ -50,7 +50,7 @@ namespace Shopping.Controllers
         [HttpPut("ResetPassword")]
         public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
         {
-            var result = await _userServices.ResetPassword(dto);
+            var result = await _authServices.ResetPassword(dto);
             if (result.IsSuccess)
                 return Ok(result);
             return BadRequest(result);
@@ -61,7 +61,7 @@ namespace Shopping.Controllers
         [HttpPut("ForgetPassword")]
         public async Task<IActionResult> ForgetPassword(ForgetPasswordDto dto)
         {
-            var result = await _userServices.ForgetPassword(dto);
+            var result = await _authServices.ForgetPassword(dto);
             if (result.IsSuccess)
                 return Ok(result);
             return BadRequest(result);

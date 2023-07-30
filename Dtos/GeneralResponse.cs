@@ -1,4 +1,4 @@
-﻿namespace Shopping.Dtos.ResponseDtos
+﻿namespace Shopping.Dtos
 {
     public class GeneralResponse<Type> where Type : class
     {

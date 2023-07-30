@@ -1,19 +1,20 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Shopping.Context;
+using Shopping.Dtos;
 using Shopping.Dtos.RequestDtos;
 using Shopping.Dtos.ResponseDtos;
 using Shopping.Helpers;
 using Shopping.Models;
 
-namespace Shopping.Services
+namespace Shopping.Services.Auth
 {
-    public class UserServices : IUserServices
+    public class AuthServices : IAuthServices
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
 
-        public UserServices(ApplicationDbContext context, IMapper mapper)
+        public AuthServices(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -29,7 +30,7 @@ namespace Shopping.Services
                     {
                         IsSuccess = false,
                         Message = "This username is already taken."
-                    }; 
+                    };
                 }
                 if (await _context.Users.AnyAsync(x => x.Email == dto.Email))
                 {
@@ -54,7 +55,7 @@ namespace Shopping.Services
                     Data = _mapper.Map<UserDto>(dto)
                 };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return new GeneralResponse<UserDto>
                 {
@@ -63,12 +64,12 @@ namespace Shopping.Services
                     Error = ex
                 };
             }
-           
+
         }
 
         public async Task<GeneralResponse<UserDto>> LogIn(LogInDto dto)
         {
-            try 
+            try
             {
                 var user = await _context.Users.SingleOrDefaultAsync(x => x.Email == dto.Email && x.Password == HashingService.HashPassword(dto.Password));
 
@@ -146,7 +147,7 @@ namespace Shopping.Services
 
         public async Task<GeneralResponse<UserDto>> ForgetPassword(ForgetPasswordDto dto)
         {
-            try 
+            try
             {
                 var user = await _context.Users.SingleOrDefaultAsync(x => x.Email == dto.Email && x.UserName == dto.UserName);
                 if (!await _context.Users.AnyAsync(x => x.UserName == dto.UserName))
@@ -196,7 +197,7 @@ namespace Shopping.Services
 
 
 
-       
-        
+
+
     }
 }
