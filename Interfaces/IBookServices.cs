@@ -3,7 +3,7 @@ using Shopping.Dtos.BookDtos.RequestDtos;
 using Shopping.Dtos.BookDtos.ResponseDtos;
 using Shopping.Models;
 
-namespace Shopping.Services.Book
+namespace Shopping.Interfaces
 {
     public interface IBookServices
     {
@@ -13,7 +13,7 @@ namespace Shopping.Services.Book
         Task<GeneralResponse<CategoryDto>> DeleteCategory(int id);
         Task<GeneralResponse<BookDto>> AddBook(BookRequestDto dto);
         Task<GeneralResponse<BookDto>> DeleteBook(int id);
-        Task<GeneralResponse<BookDto>> BookDetails(BookRequestDto dto);
+        Task<GeneralResponse<BookDto>> BookDetails(int id);
         Task<GeneralResponse<BookDto>> EditBook(BookRequestDto dto);
         Task<GeneralResponse<BookDto>> BuyABook(int id);
         Task<GeneralResponse<List<BookDto>>> GetBooksByUser(int id);

@@ -5,19 +5,22 @@ using Shopping.Dtos;
 using Shopping.Dtos.RequestDtos;
 using Shopping.Dtos.ResponseDtos;
 using Shopping.Helpers;
-using Shopping.Models;
+using Shopping.Interfaces;
+using Shopping.Models.AuthModule;
 
-namespace Shopping.Services.Auth
+namespace Shopping.Services
 {
     public class AuthServices : IAuthServices
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IConfiguration _configuration;
 
-        public AuthServices(ApplicationDbContext context, IMapper mapper)
+        public AuthServices(ApplicationDbContext context, IMapper mapper, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
+            _configuration = configuration;
         }
 
         public async Task<GeneralResponse<UserDto>> SignUp(SignUpDto dto)
@@ -167,11 +170,7 @@ namespace Shopping.Services.Auth
                     };
                 }
 
-                var configuration = new ConfigurationBuilder()
-               .AddJsonFile("appsettings.json")
-               .Build();
-
-                string DefaultPassword = configuration.GetValue<string>("DefaultPassword");
+                string DefaultPassword = _configuration.GetValue<string>("DefaultPassword");
 
                 user.Password = HashingService.HashPassword(DefaultPassword);
                 _context.Users.Update(user);

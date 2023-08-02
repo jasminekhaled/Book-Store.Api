@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Shopping.Models
+namespace Shopping.Models.BookModule
 {
     public class Book
     {
@@ -10,7 +10,7 @@ namespace Shopping.Models
         public string Title { get; set; }
 
         [MaxLength(length: 1000)]
-        public String Description { get; set; }
+        public string Description { get; set; }
         public int NumOfCopies { get; set; }
         public double Price { get; set; }
 

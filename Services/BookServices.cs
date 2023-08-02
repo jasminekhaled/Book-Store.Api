@@ -1,25 +1,28 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Shopping.Context;
 using Shopping.Dtos;
 using Shopping.Dtos.BookDtos.RequestDtos;
 using Shopping.Dtos.BookDtos.ResponseDtos;
 using Shopping.Dtos.ResponseDtos;
-using Shopping.Models;
+using Shopping.Interfaces;
+using Shopping.Models.BookModule;
 
-namespace Shopping.Services.Book
+namespace Shopping.Services
 {
     public class BookServices : IBookServices
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
-        private new List<string> _AllowedExtenstions = new List<string> { ".jpg", ".png" };
-        private long _maxAllowedPosterSize = 1048576;
-        public BookServices(ApplicationDbContext context, IMapper mapper)
+        private readonly IConfiguration _configuration;
+
+        public BookServices(ApplicationDbContext context, IMapper mapper, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
+            _configuration = configuration;
         }
 
 
@@ -29,7 +32,7 @@ namespace Shopping.Services.Book
             try
             {
                 var list = await _context.Categories.ToListAsync();
-                
+
                 return new GeneralResponse<List<CategoryDto>>
                 {
                     IsSuccess = true,
@@ -48,14 +51,14 @@ namespace Shopping.Services.Book
             }
 
 
-        }  
+        }
 
 
         public async Task<GeneralResponse<CategoryDto>> AddCategory(AddCategoryDto dto)
         {
             try
             {
-                if(await _context.Categories.AnyAsync(c => c.Name == dto.Name))
+                if (await _context.Categories.AnyAsync(c => c.Name == dto.Name))
                 {
                     return new GeneralResponse<CategoryDto>
                     {
@@ -68,7 +71,7 @@ namespace Shopping.Services.Book
                 await _context.Categories.AddAsync(category);
                 await _context.SaveChangesAsync();
 
-                return new  GeneralResponse<CategoryDto>
+                return new GeneralResponse<CategoryDto>
                 {
                     IsSuccess = true,
                     Message = "New Category Is Added Successfully.",
@@ -90,7 +93,7 @@ namespace Shopping.Services.Book
 
         public async Task<GeneralResponse<CategoryDto>> DeleteCategory(int id)
         {
-            try 
+            try
             {
                 var category = await _context.Categories.FindAsync(id);
                 if (category == null)
@@ -148,25 +151,28 @@ namespace Shopping.Services.Book
         }
 
 
-        public async Task<GeneralResponse<BookDto>> AddBook([FromForm]BookRequestDto dto)
+        public async Task<GeneralResponse<BookDto>> AddBook([FromForm] BookRequestDto dto)
         {
-            try 
+            try
             {
-                if(!_AllowedExtenstions.Contains(Path.GetExtension(dto.Poster.FileName).ToLower()))
+                var MaxAllowedPosterSize = _configuration.GetValue<long>("MaxAllowedPosterSize");
+                List<string> AllowedExtenstions = _configuration.GetSection("AllowedExtenstions").Get<List<string>>();
+
+                if (!AllowedExtenstions.Contains(Path.GetExtension(dto.Poster.FileName).ToLower()))
                 {
                     return new GeneralResponse<BookDto>
                     {
                         IsSuccess = false,
-                        Message = "only .jpg and .png images are allowed."
+                        Message = "Only .jpg and .png Images Are Allowed."
                     };
                 }
 
-                if (dto.Poster.Length > _maxAllowedPosterSize)
+                if (dto.Poster.Length > MaxAllowedPosterSize)
                 {
                     return new GeneralResponse<BookDto>
                     {
                         IsSuccess = false,
-                        Message = "max allowed size is 1MB."
+                        Message = "Max Allowed Size Is 1MB."
                     };
                 }
                 if (dto.NumOfCopies < 1)
@@ -185,7 +191,7 @@ namespace Shopping.Services.Book
                         Message = "The Price cannot be a negative number."
                     };
                 }
-                if (dto.Rate < 0 && dto.Rate > 10)
+                if (dto.Rate < 0 || dto.Rate > 10)
                 {
                     return new GeneralResponse<BookDto>
                     {
@@ -201,12 +207,41 @@ namespace Shopping.Services.Book
                         Message = "The Year must be a positive number."
                     };
                 }
+                foreach(var id in dto.CategoryId)
+                {
+                    if (!await _context.Categories.AnyAsync(i => i.Id == id))
+                    {
+                       return new GeneralResponse<BookDto>
+                    {
+                        IsSuccess = false,
+                        Message = "No Category exists with this Id."
+                    }; 
+                    }
+                }
+                using var dataStream = new MemoryStream();
+                await dto.Poster.CopyToAsync(dataStream);
 
+                var book = _mapper.Map<Book>(dto);
+
+                book.Poster = dataStream.ToArray();
+                
+                foreach (var id in dto.CategoryId)
+                {
+                    var category = await _context.Categories.FindAsync(id);
+                    //Category cate = new Category { Id = id };
+                    //book.Categories.Add(cate);
+                    book.Categories.Add(category);
+                }
+
+                await _context.Books.AddAsync(book);
+                _context.SaveChanges();
 
                 return new GeneralResponse<BookDto>
                 {
                     IsSuccess = true,
-                    Message = "Books Listed Successfully."
+                    Message = "The Book is added successfully.",
+                    Data = _mapper.Map<BookDto>(book)
+
                 };
             }
             catch (Exception ex)
@@ -257,9 +292,36 @@ namespace Shopping.Services.Book
 
 
 
-        public Task<GeneralResponse<BookDto>> BookDetails(BookRequestDto dto)
+        public async Task<GeneralResponse<BookDto>> BookDetails(int id)
         {
-            throw new NotImplementedException();
+            try 
+            {
+                var book = await _context.Books.FindAsync(id);
+                if(book == null)
+                {
+                    return new GeneralResponse<BookDto>
+                    {
+                        IsSuccess = false,
+                        Message = "No book is existed with this id."
+                    };
+                }
+                return new GeneralResponse<BookDto>
+                {
+                    IsSuccess = true,
+                    Message = "Here are the Details.",
+                    Data = _mapper.Map<BookDto>(book)
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new GeneralResponse<BookDto>
+                {
+                    IsSuccess = false,
+                    Message = "Something went wrong.",
+                    Error = ex
+                };
+            }
         }
 
 

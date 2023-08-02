@@ -3,7 +3,8 @@ using Shopping.Dtos.BookDtos.RequestDtos;
 using Shopping.Dtos.BookDtos.ResponseDtos;
 using Shopping.Dtos.RequestDtos;
 using Shopping.Dtos.ResponseDtos;
-using Shopping.Models;
+using Shopping.Models.AuthModule;
+using Shopping.Models.BookModule;
 
 namespace Shopping.AutoMapper
 {
@@ -17,6 +18,10 @@ namespace Shopping.AutoMapper
             CreateMap<Category, CategoryDto>();
             CreateMap<AddCategoryDto, CategoryDto>();
             CreateMap<AddCategoryDto, Category>();
+            CreateMap<Book, BookDto>();
+            CreateMap<BookRequestDto, Book>()
+                .ForMember(src => src.Categories, opt => opt.Ignore())
+                .ForMember(src => src.Poster, opt => opt.Ignore());
             CreateMap<Book, BookDto>();
         }
     }

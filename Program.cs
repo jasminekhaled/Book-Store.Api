@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shopping.Context;
-using Shopping.Services.Auth;
-using Shopping.Services.Book;
+using Shopping.Interfaces;
+using Shopping.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var ConnectionString = builder.Configuration.GetConnectionString(name: "DefaultConnection");

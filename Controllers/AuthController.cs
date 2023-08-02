@@ -8,7 +8,7 @@ using System;
 using System.Text;
 using Shopping.Helpers;
 using Shopping.Dtos.RequestDtos;
-using Shopping.Services.Auth;
+using Shopping.Interfaces;
 
 namespace Shopping.Controllers
 {

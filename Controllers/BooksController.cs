@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shopping.Dtos.BookDtos.RequestDtos;
-using Shopping.Services.Book;
+using Shopping.Interfaces;
 
 namespace Shopping.Controllers
 {
@@ -81,8 +81,15 @@ namespace Shopping.Controllers
         }
 
 
-        
 
+        [HttpGet("BookDetails")]
+        public async Task<IActionResult> BookDetails(int id)
+        {
+            var result = await _bookServices.BookDetails(id);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
 
     }
 }

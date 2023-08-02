@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
-namespace Shopping.Models
+namespace Shopping.Models.AuthModule
 {
     public class User
     {

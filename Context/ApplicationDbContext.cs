@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Shopping.Models;
+using Shopping.Models.AuthModule;
+using Shopping.Models.BookModule;
 
 namespace Shopping.Context
 {

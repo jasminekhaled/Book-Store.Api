@@ -1,4 +1,4 @@
-﻿using Shopping.Models;
+﻿using Shopping.Models.BookModule;
 using System.ComponentModel.DataAnnotations;
 
 namespace Shopping.Dtos.BookDtos.ResponseDtos
@@ -11,11 +11,11 @@ namespace Shopping.Dtos.BookDtos.ResponseDtos
         [MaxLength(length: 1000)]
         public String Description { get; set; }
         public int NumOfCopies { get; set; }
-        public int Price { get; set; }
+        public double Price { get; set; }
 
         [MaxLength(length: 150)]
         public string Author { get; set; }
-        public int Rate { get; set; }
+        public double Rate { get; set; }
         public byte[] Poster { get; set; }
         public int Year { get; set; }
         public List<Category> Categories { get; set; }

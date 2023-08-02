@@ -1,4 +1,4 @@
-﻿using Shopping.Models;
+﻿using Shopping.Models.BookModule;
 using System.ComponentModel.DataAnnotations;
 
 namespace Shopping.Dtos.BookDtos.RequestDtos
@@ -18,6 +18,6 @@ namespace Shopping.Dtos.BookDtos.RequestDtos
         public double Rate { get; set; }
         public IFormFile Poster { get; set; }
         public int Year { get; set; }
-        public List<Category> Categories { get; set; }
+        public List<int> CategoryId { get; set; }
     }
 }

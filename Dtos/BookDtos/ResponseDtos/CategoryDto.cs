@@ -1,4 +1,4 @@
-﻿using Shopping.Models;
+﻿using Shopping.Models.BookModule;
 using System.ComponentModel.DataAnnotations;
 
 namespace Shopping.Dtos.BookDtos.ResponseDtos

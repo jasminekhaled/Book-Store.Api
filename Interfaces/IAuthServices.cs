@@ -3,7 +3,7 @@ using Shopping.Dtos.RequestDtos;
 using Shopping.Dtos.ResponseDtos;
 using Shopping.Models;
 
-namespace Shopping.Services.Auth
+namespace Shopping.Interfaces
 {
     public interface IAuthServices
     {
