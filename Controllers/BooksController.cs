@@ -91,5 +91,16 @@ namespace Shopping.Controllers
             return BadRequest(result);
         }
 
+
+
+        [HttpPatch("EditBook")]
+        public async Task<IActionResult> EditBook(int id, [FromForm]EditRequestDto dto)
+        {
+            var result = await _bookServices.EditBook(id, dto);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
     }
 }

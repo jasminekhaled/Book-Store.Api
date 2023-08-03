@@ -326,9 +326,142 @@ namespace Shopping.Services
 
 
 
-        public Task<GeneralResponse<BookDto>> EditBook(BookRequestDto dto)
+        public async Task<GeneralResponse<BookDto>> EditBook(int id, [FromForm]EditRequestDto dto)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var book = await _context.Books.FindAsync(id);
+                if (book == null)
+                {
+                    return new GeneralResponse<BookDto>
+                    {
+                        IsSuccess = false,
+                        Message = "No book is existed with this id."
+                    };
+                }
+                if(dto.Year != null && dto.Year < 1)
+                {
+                    return new GeneralResponse<BookDto>
+                    {
+                        IsSuccess = false,
+                        Message = "The Year must be a positive number."
+                    };
+                }
+                if (dto.NumOfCopies != null && dto.NumOfCopies < 1)
+                {
+                    return new GeneralResponse<BookDto>
+                    {
+                        IsSuccess = false,
+                        Message = "Num of copies should be at least 1."
+                    };
+                }
+                if (dto.Price != null && dto.Price < 0)
+                {
+                    return new GeneralResponse<BookDto>
+                    {
+                        IsSuccess = false,
+                        Message = "The Price cannot be a negative number."
+                    };
+                }
+                if (dto.Rate != null)
+                {
+                    if (dto.Rate < 0 || dto.Rate > 10)
+                    {
+                        return new GeneralResponse<BookDto>
+                        {
+                            IsSuccess = false,
+                            Message = "The Rate must be between 0 and 10."
+                        };
+                    }
+                }
+                if(dto.Poster != null)
+                {
+                    var MaxAllowedPosterSize = _configuration.GetValue<long>("MaxAllowedPosterSize");
+                    List<string> AllowedExtenstions = _configuration.GetSection("AllowedExtenstions").Get<List<string>>();
+
+                    if (!AllowedExtenstions.Contains(Path.GetExtension(dto.Poster.FileName).ToLower()))
+                    {
+                        return new GeneralResponse<BookDto>
+                        {
+                            IsSuccess = false,
+                            Message = "Only .jpg and .png Images Are Allowed."
+                        };
+                    }
+
+                    if (dto.Poster.Length > MaxAllowedPosterSize)
+                    {
+                        return new GeneralResponse<BookDto>
+                        {
+                            IsSuccess = false,
+                            Message = "Max Allowed Size Is 1MB."
+                        };
+                    }
+                }
+
+                if(dto.CategoryId != null)
+                {
+                    foreach (var iD in dto.CategoryId)
+                    {
+                        if (!await _context.Categories.AnyAsync(i => i.Id == iD))
+                        {
+                            return new GeneralResponse<BookDto>
+                            {
+                                IsSuccess = false,
+                                Message = "No Category exists with this Id."
+                            };
+                        }
+                    }
+                }
+
+               /* if(dto.CategoryId!=null)
+                {
+                    foreach (var iD in dto.CategoryId)
+                    {
+                        var category = await _context.Categories.FindAsync(iD);
+                        //Category cate = new Category { Id = id };
+                        //book.Categories.Add(cate);
+                        book.Categories.Add(category);
+                    }
+                }*/
+
+                if(dto.Poster!=null)
+                    {
+                        using var dataStream = new MemoryStream();
+                        await dto.Poster.CopyToAsync(dataStream);
+                        book.Poster = dataStream.ToArray();
+                    }
+
+                
+                book.Title = dto.Title ?? book.Title;
+                book.Author = dto.Author ?? book.Author;
+                book.Description = dto.Description ?? book.Description;
+                book.NumOfCopies = dto.NumOfCopies ?? book.NumOfCopies;
+                book.Price = dto.Price ?? book.Price;
+                book.Year = dto.Year ?? book.Year;
+                book.Rate = dto.Rate ?? book.Rate;
+
+                _context.Books.Update(book);
+                _context.SaveChanges();
+
+                return new GeneralResponse<BookDto>
+                {
+                    IsSuccess = true,
+                    Message = "The book is editted successfully.",
+                    Data = _mapper.Map<BookDto>(book)
+                };
+
+
+
+            }
+            catch (Exception ex)
+            {
+                return new GeneralResponse<BookDto>
+                {
+                    IsSuccess = false,
+                    Message = "Something went wrong.",
+                    Error = ex
+                };
+            }
         }
 
 

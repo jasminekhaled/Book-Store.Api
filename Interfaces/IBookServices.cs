@@ -14,7 +14,7 @@ namespace Shopping.Interfaces
         Task<GeneralResponse<BookDto>> AddBook(BookRequestDto dto);
         Task<GeneralResponse<BookDto>> DeleteBook(int id);
         Task<GeneralResponse<BookDto>> BookDetails(int id);
-        Task<GeneralResponse<BookDto>> EditBook(BookRequestDto dto);
+        Task<GeneralResponse<BookDto>> EditBook(int id, EditRequestDto dto);
         Task<GeneralResponse<BookDto>> BuyABook(int id);
         Task<GeneralResponse<List<BookDto>>> GetBooksByUser(int id);
 
