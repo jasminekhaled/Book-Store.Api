@@ -225,13 +225,13 @@ namespace Shopping.Services
 
                 book.Poster = dataStream.ToArray();
                 
-                foreach (var id in dto.CategoryId)
+               /* foreach (var id in dto.CategoryId)
                 {
                     var category = await _context.Categories.FindAsync(id);
                     //Category cate = new Category { Id = id };
                     //book.Categories.Add(cate);
                     book.Categories.Add(category);
-                }
+                }*/
 
                 await _context.Books.AddAsync(book);
                 _context.SaveChanges();
@@ -466,17 +466,77 @@ namespace Shopping.Services
 
 
 
-        public Task<GeneralResponse<BookDto>> BuyABook(int id)
+        public async Task<GeneralResponse<BookDto>> BuyABook(int bookId,int userId,BuyABookRequestDto dto)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                {
+                    return new GeneralResponse<BookDto>
+                    {
+                        IsSuccess = false,
+                        Message = "No user Found.",
+                    };
+                }
+
+                var book = await _context.Books.FindAsync(bookId);
+                if (book == null)
+                {
+                    return new GeneralResponse<BookDto>
+                    {
+                        IsSuccess = false,
+                        Message = "No Book Found.",
+                    };
+                }
+                if(dto.NumOfCopies < 1 || dto.NumOfCopies > book.NumOfCopies)
+                {
+                    return new GeneralResponse<BookDto>
+                    {
+                        IsSuccess = false,
+                        Message = "the number of copies that you want isnot available.",
+                    };
+                }
+
+                book.NumOfCopies = book.NumOfCopies - dto.NumOfCopies;
+               //  user.Books.Add(book);
+                if (book.NumOfCopies == 0)
+                {
+                    _context.Books.Remove(book);
+                    _context.SaveChanges();
+                    return new GeneralResponse<BookDto>
+                    {
+                        IsSuccess = true,
+                        Message = "The book has been successfully purchased.",
+                    };
+                }
+
+                _context.Books.Update(book);
+                _context.SaveChanges();
+
+                return new GeneralResponse<BookDto>
+                {
+                    IsSuccess = true,
+                    Message = "The book has been successfully purchased.",
+                    Data = _mapper.Map<BookDto>(book)
+                };
+
+
+            }
+            catch (Exception ex)
+            {
+                return new GeneralResponse<BookDto>
+                {
+                    IsSuccess = false,
+                    Message = "Something went wrong.",
+                    Error = ex
+                };
+            }
         }
 
 
 
-        public Task<GeneralResponse<List<BookDto>>> GetBooksByUser(int id)
-        {
-            throw new NotImplementedException();
-        }
+        
 
 
 

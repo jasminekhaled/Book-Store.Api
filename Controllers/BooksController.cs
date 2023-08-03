@@ -101,6 +101,14 @@ namespace Shopping.Controllers
                 return Ok(result);
             return BadRequest(result);
         }
+        [HttpPut("BuyABook")]
+        public async Task<IActionResult> BuyABook(int bookId, int userId, BuyABookRequestDto dto)
+        {
+            var result = await _bookServices.BuyABook(bookId, userId, dto);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
 
     }
 }

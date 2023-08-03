@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Shopping.Models.BookModule;
 using System.ComponentModel.DataAnnotations;
 
 namespace Shopping.Models.AuthModule
@@ -16,5 +17,6 @@ namespace Shopping.Models.AuthModule
 
         [MinLength(length: 10)]
         public string Password { get; set; }
+        public List<Book> Books { get; set; }
     }
 }
