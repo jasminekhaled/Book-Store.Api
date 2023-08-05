@@ -20,7 +20,7 @@ namespace Shopping.Models.BookModule
         public double Rate { get; set; }
         public byte[] Poster { get; set; }
         public int Year { get; set; }
-        public List<Category> Categories { get; set; }
+        public List<BookCategories> bookCategories { get; set; }
         public List<User> Users { get; set; }
 
     }
