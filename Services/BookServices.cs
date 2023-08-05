@@ -224,17 +224,19 @@ namespace Shopping.Services
                 var book = _mapper.Map<Book>(dto);
 
                 book.Poster = dataStream.ToArray();
-                
-               /* foreach (var id in dto.CategoryId)
-                {
-                    var category = await _context.Categories.FindAsync(id);
-                    //Category cate = new Category { Id = id };
-                    //book.Categories.Add(cate);
-                    book.Categories.Add(category);
-                }*/
 
                 await _context.Books.AddAsync(book);
                 _context.SaveChanges();
+
+                var bookCategories = dto.CategoryId.Select(c => new BookCategories
+                {
+                    bookId = book.Id,
+                    categoryId = c
+                }).ToList();
+
+                await _context.bookCategories.AddRangeAsync(bookCategories);
+                _context.SaveChanges();
+
 
                 return new GeneralResponse<BookDto>
                 {
