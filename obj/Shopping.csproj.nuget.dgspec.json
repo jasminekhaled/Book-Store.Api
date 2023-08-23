@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "G:\\WEB DEVELOPMENT\\Shopping\\Shopping.csproj": {}
+    "C:\\WorkingSpace\\CodeReview\\Shopping.csproj": {}
   },
   "projects": {
-    "G:\\WEB DEVELOPMENT\\Shopping\\Shopping.csproj": {
+    "C:\\WorkingSpace\\CodeReview\\Shopping.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "G:\\WEB DEVELOPMENT\\Shopping\\Shopping.csproj",
+        "projectUniqueName": "C:\\WorkingSpace\\CodeReview\\Shopping.csproj",
         "projectName": "Shopping",
-        "projectPath": "G:\\WEB DEVELOPMENT\\Shopping\\Shopping.csproj",
-        "packagesPath": "C:\\Users\\com\\.nuget\\packages\\",
-        "outputPath": "G:\\WEB DEVELOPMENT\\Shopping\\obj\\",
+        "projectPath": "C:\\WorkingSpace\\CodeReview\\Shopping.csproj",
+        "packagesPath": "C:\\Users\\AHMED\\.nuget\\packages\\",
+        "outputPath": "C:\\WorkingSpace\\CodeReview\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\com\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\AHMED\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -73,7 +73,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -85,7 +86,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.301\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
         }
       }
     }

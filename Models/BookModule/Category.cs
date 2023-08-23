@@ -9,7 +9,7 @@ namespace Shopping.Models.BookModule
         [MaxLength(length: 50)]
         [MinLength(length: 3)]
         public string Name { get; set; }
-        public List<Book> Books { get; set; }
+        public List<BookCategories> booksCategories { get; set; }
 
     }
 }
