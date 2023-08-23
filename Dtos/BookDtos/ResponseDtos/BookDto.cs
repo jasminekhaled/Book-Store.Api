@@ -18,6 +18,7 @@ namespace Shopping.Dtos.BookDtos.ResponseDtos
         public double Rate { get; set; }
         public byte[] Poster { get; set; }
         public int Year { get; set; }
-        public List<Category> Categories { get; set; }
+        public List<int> categoryId { get; set; }
+        public List<string> categoryName { get; set; }
     }
 }

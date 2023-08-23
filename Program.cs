@@ -15,6 +15,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(ConnectionString));
 builder.Services.AddScoped<IAuthServices, AuthServices>();
 builder.Services.AddScoped<IBookServices, BookServices>();
+builder.Services.AddScoped<ICartServices, CartServices>();
 builder.Services.AddAutoMapper(typeof(Program));
 var app = builder.Build();
 

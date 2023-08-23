@@ -224,23 +224,30 @@ namespace Shopping.Services
                 var book = _mapper.Map<Book>(dto);
 
                 book.Poster = dataStream.ToArray();
-                
-               /* foreach (var id in dto.CategoryId)
-                {
-                    var category = await _context.Categories.FindAsync(id);
-                    //Category cate = new Category { Id = id };
-                    //book.Categories.Add(cate);
-                    book.Categories.Add(category);
-                }*/
 
                 await _context.Books.AddAsync(book);
                 _context.SaveChanges();
+                 
+                var bookCategories = dto.CategoryId.Select(c => new BookCategories
+                {
+                    bookId = book.Id,
+                    categoryId = c
+                }).ToList();
+
+                await _context.bookCategories.AddRangeAsync(bookCategories); 
+                _context.SaveChanges();
+
+                var names = await _context.bookCategories.Where(c => c.bookId == book.Id).Select(bc => bc.Category.Name).ToListAsync();
+
+                var data = _mapper.Map<BookDto>(book);
+                data.categoryName = names;
+                data.categoryId = dto.CategoryId;
 
                 return new GeneralResponse<BookDto>
                 {
                     IsSuccess = true,
                     Message = "The Book is added successfully.",
-                    Data = _mapper.Map<BookDto>(book)
+                    Data = data
 
                 };
             }
@@ -305,13 +312,19 @@ namespace Shopping.Services
                         Message = "No book is existed with this id."
                     };
                 }
+                var names = await _context.bookCategories.Where(c => c.bookId == book.Id).Select(bc => bc.Category.Name).ToListAsync();
+                var ids = await _context.bookCategories.Where(c => c.bookId == book.Id).Select(i => i.categoryId).ToListAsync();
+                
+                var data = _mapper.Map<BookDto>(book);
+                data.categoryName = names;
+                data.categoryId = ids;
+
                 return new GeneralResponse<BookDto>
                 {
                     IsSuccess = true,
                     Message = "Here are the Details.",
-                    Data = _mapper.Map<BookDto>(book)
+                    Data = data
                 };
-
             }
             catch (Exception ex)
             {
@@ -411,27 +424,33 @@ namespace Shopping.Services
                             };
                         }
                     }
+                    var existingBookCategories = await _context.bookCategories
+                     .Where(bc => bc.bookId == book.Id)
+                     .ToListAsync();
+
+                    _context.bookCategories.RemoveRange(existingBookCategories);
+
+                    var bookCategories = dto.CategoryId.Select(c => new BookCategories
+                    {
+                        bookId = book.Id,
+                        categoryId = c
+                    }).ToList();
+ 
+                   await _context.bookCategories.AddRangeAsync(bookCategories);
+                   _context.Books.UpdateRange(book);
+                   _context.SaveChanges(); 
+
+                   
                 }
 
-               /* if(dto.CategoryId!=null)
-                {
-                    foreach (var iD in dto.CategoryId)
-                    {
-                        var category = await _context.Categories.FindAsync(iD);
-                        //Category cate = new Category { Id = id };
-                        //book.Categories.Add(cate);
-                        book.Categories.Add(category);
-                    }
-                }*/
 
                 if(dto.Poster!=null)
-                    {
-                        using var dataStream = new MemoryStream();
-                        await dto.Poster.CopyToAsync(dataStream);
-                        book.Poster = dataStream.ToArray();
-                    }
+                {
+                    using var dataStream = new MemoryStream();
+                    await dto.Poster.CopyToAsync(dataStream);
+                    book.Poster = dataStream.ToArray();
+                }
 
-                
                 book.Title = dto.Title ?? book.Title;
                 book.Author = dto.Author ?? book.Author;
                 book.Description = dto.Description ?? book.Description;
@@ -443,14 +462,18 @@ namespace Shopping.Services
                 _context.Books.Update(book);
                 _context.SaveChanges();
 
+                var names = await _context.bookCategories.Where(c => c.bookId == book.Id).Select(bc => bc.Category.Name).ToListAsync();
+
+                var data = _mapper.Map<BookDto>(book);
+                data.categoryName = names;
+                data.categoryId = dto.CategoryId;
+
                 return new GeneralResponse<BookDto>
                 {
                     IsSuccess = true,
                     Message = "The book is editted successfully.",
-                    Data = _mapper.Map<BookDto>(book)
+                    Data = data
                 };
-
-
 
             }
             catch (Exception ex)
@@ -489,6 +512,7 @@ namespace Shopping.Services
                         Message = "No Book Found.",
                     };
                 }
+
                 if(dto.NumOfCopies < 1 || dto.NumOfCopies > book.NumOfCopies)
                 {
                     return new GeneralResponse<BookDto>
@@ -499,26 +523,29 @@ namespace Shopping.Services
                 }
 
                 book.NumOfCopies = book.NumOfCopies - dto.NumOfCopies;
-               //  user.Books.Add(book);
-                if (book.NumOfCopies == 0)
+                
+                var bookUsers = new BookUsers
                 {
-                    _context.Books.Remove(book);
-                    _context.SaveChanges();
-                    return new GeneralResponse<BookDto>
-                    {
-                        IsSuccess = true,
-                        Message = "The book has been successfully purchased.",
-                    };
-                }
+                    bookId = book.Id,
+                    userId = user.id
+                };
+                await _context.bookUsers.AddRangeAsync(bookUsers); 
 
                 _context.Books.Update(book);
                 _context.SaveChanges();
+
+                var names = await _context.bookCategories.Where(c => c.bookId == book.Id).Select(bc => bc.Category.Name).ToListAsync();
+                var ids = await _context.bookCategories.Where(c => c.bookId == book.Id).Select(i => i.categoryId).ToListAsync();
+
+                var data = _mapper.Map<BookDto>(book);
+                data.categoryName = names;
+                data.categoryId = ids;
 
                 return new GeneralResponse<BookDto>
                 {
                     IsSuccess = true,
                     Message = "The book has been successfully purchased.",
-                    Data = _mapper.Map<BookDto>(book)
+                    Data = data
                 };
 
 

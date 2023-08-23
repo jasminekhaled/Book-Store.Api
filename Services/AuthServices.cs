@@ -7,6 +7,7 @@ using Shopping.Dtos.ResponseDtos;
 using Shopping.Helpers;
 using Shopping.Interfaces;
 using Shopping.Models.AuthModule;
+using Shopping.Models.CartModule;
 
 namespace Shopping.Services
 {
@@ -43,11 +44,12 @@ namespace Shopping.Services
                         Message = "User is already Exist."
                     };
                 }
-
+                var cart = new Cart();
                 var user = _mapper.Map<User>(dto);
                 user.Password = HashingService.HashPassword(dto.Password);
+                user.Cart = cart;
 
-
+                await _context.carts.AddAsync(cart);
                 await _context.Users.AddAsync(user);
                 await _context.SaveChangesAsync();
 

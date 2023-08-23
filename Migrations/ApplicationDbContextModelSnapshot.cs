@@ -21,36 +21,6 @@ namespace Shopping.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("BookCategory", b =>
-                {
-                    b.Property<int>("BooksId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CategoriesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("BooksId", "CategoriesId");
-
-                    b.HasIndex("CategoriesId");
-
-                    b.ToTable("BookCategory");
-                });
-
-            modelBuilder.Entity("BookUser", b =>
-                {
-                    b.Property<int>("BooksId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Usersid")
-                        .HasColumnType("int");
-
-                    b.HasKey("BooksId", "Usersid");
-
-                    b.HasIndex("Usersid");
-
-                    b.ToTable("BookUser");
-                });
-
             modelBuilder.Entity("Shopping.Models.AuthModule.User", b =>
                 {
                     b.Property<int>("id")
@@ -121,6 +91,52 @@ namespace Shopping.Migrations
                     b.ToTable("Books");
                 });
 
+            modelBuilder.Entity("Shopping.Models.BookModule.BookCategories", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("bookId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("categoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("bookId");
+
+                    b.HasIndex("categoryId");
+
+                    b.ToTable("bookCategories");
+                });
+
+            modelBuilder.Entity("Shopping.Models.BookModule.BookUsers", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<int>("bookId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("userId")
+                        .HasColumnType("int");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("bookId");
+
+                    b.HasIndex("userId");
+
+                    b.ToTable("BookUsers");
+                });
+
             modelBuilder.Entity("Shopping.Models.BookModule.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -139,34 +155,59 @@ namespace Shopping.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("BookCategory", b =>
+            modelBuilder.Entity("Shopping.Models.BookModule.BookCategories", b =>
                 {
-                    b.HasOne("Shopping.Models.BookModule.Book", null)
-                        .WithMany()
-                        .HasForeignKey("BooksId")
+                    b.HasOne("Shopping.Models.BookModule.Book", "Book")
+                        .WithMany("bookCategories")
+                        .HasForeignKey("bookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Shopping.Models.BookModule.Category", null)
-                        .WithMany()
-                        .HasForeignKey("CategoriesId")
+                    b.HasOne("Shopping.Models.BookModule.Category", "Category")
+                        .WithMany("booksCategories")
+                        .HasForeignKey("categoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("BookUser", b =>
+            modelBuilder.Entity("Shopping.Models.BookModule.BookUsers", b =>
                 {
-                    b.HasOne("Shopping.Models.BookModule.Book", null)
-                        .WithMany()
-                        .HasForeignKey("BooksId")
+                    b.HasOne("Shopping.Models.BookModule.Book", "Book")
+                        .WithMany("bookUsers")
+                        .HasForeignKey("bookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Shopping.Models.AuthModule.User", null)
-                        .WithMany()
-                        .HasForeignKey("Usersid")
+                    b.HasOne("Shopping.Models.AuthModule.User", "User")
+                        .WithMany("bookUsers")
+                        .HasForeignKey("userId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Shopping.Models.AuthModule.User", b =>
+                {
+                    b.Navigation("bookUsers");
+                });
+
+            modelBuilder.Entity("Shopping.Models.BookModule.Book", b =>
+                {
+                    b.Navigation("bookCategories");
+
+                    b.Navigation("bookUsers");
+                });
+
+            modelBuilder.Entity("Shopping.Models.BookModule.Category", b =>
+                {
+                    b.Navigation("booksCategories");
                 });
 #pragma warning restore 612, 618
         }

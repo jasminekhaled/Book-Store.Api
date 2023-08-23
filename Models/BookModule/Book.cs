@@ -1,4 +1,5 @@
 ﻿using Shopping.Models.AuthModule;
+using Shopping.Models.CartModule;
 using System.ComponentModel.DataAnnotations;
 
 namespace Shopping.Models.BookModule
@@ -21,7 +22,8 @@ namespace Shopping.Models.BookModule
         public byte[] Poster { get; set; }
         public int Year { get; set; }
         public List<BookCategories> bookCategories { get; set; }
-        public List<User> Users { get; set; }
+        public List<BookUsers> bookUsers { get; set; }
+        public List<CartBooks> cartBooks { get; set; }
 
     }
 }
