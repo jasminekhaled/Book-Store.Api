@@ -7,8 +7,8 @@ namespace Shopping.Models.CartModule
     public class CartBooks
     {
         public int Id { get; set; }
-        public int BookId { get; set; }
-        public int CartId { get; set; } 
+        public int bookId { get; set; }
+        public int cartId { get; set; } 
         public int WantedCopies { get; set; }
         public double Price { get; set; }
 

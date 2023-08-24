@@ -49,7 +49,7 @@ namespace Shopping.Services
                 user.Password = HashingService.HashPassword(dto.Password);
                 user.Cart = cart;
 
-                await _context.carts.AddAsync(cart);
+                await _context.Carts.AddAsync(cart);
                 await _context.Users.AddAsync(user);
                 await _context.SaveChangesAsync();
 

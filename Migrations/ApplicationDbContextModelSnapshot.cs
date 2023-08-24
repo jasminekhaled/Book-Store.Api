@@ -134,7 +134,7 @@ namespace Shopping.Migrations
 
                     b.HasIndex("userId");
 
-                    b.ToTable("BookUsers");
+                    b.ToTable("bookUsers");
                 });
 
             modelBuilder.Entity("Shopping.Models.BookModule.Category", b =>
@@ -153,6 +153,57 @@ namespace Shopping.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("Shopping.Models.CartModule.Cart", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("TotalPrice")
+                        .HasColumnType("float");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Carts");
+                });
+
+            modelBuilder.Entity("Shopping.Models.CartModule.CartBooks", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
+
+                    b.Property<int>("WantedCopies")
+                        .HasColumnType("int");
+
+                    b.Property<int>("bookId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("cartId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("bookId");
+
+                    b.HasIndex("cartId");
+
+                    b.ToTable("CartBooks");
                 });
 
             modelBuilder.Entity("Shopping.Models.BookModule.BookCategories", b =>
@@ -193,8 +244,41 @@ namespace Shopping.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Shopping.Models.CartModule.Cart", b =>
+                {
+                    b.HasOne("Shopping.Models.AuthModule.User", "User")
+                        .WithOne("Cart")
+                        .HasForeignKey("Shopping.Models.CartModule.Cart", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Shopping.Models.CartModule.CartBooks", b =>
+                {
+                    b.HasOne("Shopping.Models.BookModule.Book", "Book")
+                        .WithMany("cartBooks")
+                        .HasForeignKey("bookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Shopping.Models.CartModule.Cart", "Cart")
+                        .WithMany("cartBooks")
+                        .HasForeignKey("cartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("Cart");
+                });
+
             modelBuilder.Entity("Shopping.Models.AuthModule.User", b =>
                 {
+                    b.Navigation("Cart")
+                        .IsRequired();
+
                     b.Navigation("bookUsers");
                 });
 
@@ -203,11 +287,18 @@ namespace Shopping.Migrations
                     b.Navigation("bookCategories");
 
                     b.Navigation("bookUsers");
+
+                    b.Navigation("cartBooks");
                 });
 
             modelBuilder.Entity("Shopping.Models.BookModule.Category", b =>
                 {
                     b.Navigation("booksCategories");
+                });
+
+            modelBuilder.Entity("Shopping.Models.CartModule.Cart", b =>
+                {
+                    b.Navigation("cartBooks");
                 });
 #pragma warning restore 612, 618
         }

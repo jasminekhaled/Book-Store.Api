@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Shopping.Context;
 using Shopping.Dtos;
 using Shopping.Dtos.CartsDtos.RequestDtos;
@@ -19,6 +20,38 @@ namespace Shopping.Services
             _mapper = mapper;
         }
 
+        public async Task<GeneralResponse<List<ListOfBooksDto>>> ListOfBooksInCart(int id)
+        {
+            try
+            {
+                if(!await _context.Carts.AnyAsync(i => i.Id == id))
+                {
+                    return new GeneralResponse<List<ListOfBooksDto>>
+                    {
+                        IsSuccess = false,
+                        Message = "No cart found with this Id!",
+                    };
+                }
+                var books = await _context.CartBooks.Where(c => c.cartId == id).ToListAsync();
+
+                return new GeneralResponse<List<ListOfBooksDto>>
+                {
+                    IsSuccess = true,
+                    Message = "Books Listed Successfully.",
+                    Data = _mapper.Map<List<ListOfBooksDto>>(books)
+                };
+            }
+            catch (Exception ex)
+            {
+                return new GeneralResponse<List<ListOfBooksDto>>
+                {
+                    IsSuccess = false,
+                    Message = "Something went wrong.",
+                    Error = ex
+                };
+            }
+
+        }
         public async Task<GeneralResponse<CartDto>> AddToCart(int userId,int cartId, int bookId, AddDto dto)
         {
             try 
@@ -44,7 +77,7 @@ namespace Shopping.Services
                 }
 
                 var book = await _context.Books.FindAsync(bookId);
-                if (user == null)
+                if (book == null)
                 {
                     return new GeneralResponse<CartDto>
                     {
@@ -67,8 +100,8 @@ namespace Shopping.Services
 
                 var cartBook = new CartBooks
                 {
-                    BookId = book.Id,
-                    CartId = cart.Id,
+                    bookId = book.Id,
+                    cartId = cart.Id, 
                     WantedCopies = dto.wantedCopies,
                     Price = BookPrice
                 };
@@ -83,7 +116,7 @@ namespace Shopping.Services
                 return new GeneralResponse<CartDto>
                 {
                     IsSuccess = true,
-                    Message = "Categories Listed Successfully.",
+                    Message = "The Book is added to the cart successfully.",
                     Data = data
                 };
             }
@@ -108,9 +141,6 @@ namespace Shopping.Services
             throw new NotImplementedException();
         }
 
-        public Task<GeneralResponse<List<CartDto>>> ListOfBooksInCart(int id)
-        {
-            throw new NotImplementedException();
-        }
+        
     }
 }

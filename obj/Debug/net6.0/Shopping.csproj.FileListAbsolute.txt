@@ -83,3 +83,8 @@ G:\WEB DEVELOPMENT\Shopping\obj\Debug\net6.0\ref\Shopping.dll
 G:\WEB DEVELOPMENT\Shopping\bin\Debug\net6.0\Microsoft.AspNetCore.Authentication.Google.dll
 G:\WEB DEVELOPMENT\Shopping\bin\Debug\net6.0\AutoMapper.dll
 G:\WEB DEVELOPMENT\Shopping\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+G:\WEB DEVELOPMENT\Shopping\obj\Debug\net6.0\staticwebassets\msbuild.Shopping.Microsoft.AspNetCore.StaticWebAssets.props
+G:\WEB DEVELOPMENT\Shopping\obj\Debug\net6.0\staticwebassets\msbuild.build.Shopping.props
+G:\WEB DEVELOPMENT\Shopping\obj\Debug\net6.0\staticwebassets\msbuild.buildMultiTargeting.Shopping.props
+G:\WEB DEVELOPMENT\Shopping\obj\Debug\net6.0\staticwebassets\msbuild.buildTransitive.Shopping.props
+G:\WEB DEVELOPMENT\Shopping\obj\Debug\net6.0\staticwebassets.pack.json
