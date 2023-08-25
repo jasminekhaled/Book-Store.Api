@@ -7,8 +7,8 @@ namespace Shopping.Interfaces
     public interface ICartServices
     {
         Task<GeneralResponse<CartDto>> AddToCart(int userId, int cartId, int bookId, AddDto dto);
-        Task<GeneralResponse<CartDto>> DeleteFromCart(int userId, int bookId);
-        Task<GeneralResponse<List<ListOfBooksDto>>> ListOfBooksInCart(int id);
+        Task<GeneralResponse<CartBooksDto>> DeleteFromCart(int cartId, int bookId);
+        Task<GeneralResponse<List<CartBooksDto>>> ListOfBooksInCart(int id);
         Task<GeneralResponse<List<CartDto>>> Buying(int userId, int cartId);
     }
 }

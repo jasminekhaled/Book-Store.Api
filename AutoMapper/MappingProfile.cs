@@ -27,7 +27,7 @@ namespace Shopping.AutoMapper
             CreateMap<Book, CartDto>()
                .ForMember(src => src.WantedCopies, opt => opt.Ignore())
                .ForMember(src => src.Price, opt => opt.Ignore());
-            CreateMap<CartBooks, ListOfBooksDto>();
+            CreateMap<CartBooks, CartBooksDto>();
                
 
         }

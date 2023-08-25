@@ -35,5 +35,14 @@ namespace Shopping.Controllers
                 return Ok(result);
             return BadRequest(result);
         }
+
+        [HttpDelete("DeleteFromCart")]
+        public async Task<IActionResult> DeleteFromCart(int cartId, int bookId)
+        {
+            var result = await _cartServices.DeleteFromCart(cartId, bookId);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
     }
 }
