@@ -5,6 +5,8 @@ using Shopping.Dtos;
 using Shopping.Dtos.CartsDtos.RequestDtos;
 using Shopping.Dtos.CartsDtos.ResponseDtos;
 using Shopping.Interfaces;
+using Shopping.Migrations;
+using Shopping.Models.BookModule;
 using Shopping.Models.CartModule;
 using System.Linq;
 
@@ -163,7 +165,8 @@ namespace Shopping.Services
                         Message = "No book found in your cart with this Id."
                     };
                 }
-
+                
+                cart.TotalPrice = cart.TotalPrice - check.Price;
                 _context.CartBooks.Remove(check);
                 _context.SaveChanges();
 
@@ -172,7 +175,7 @@ namespace Shopping.Services
                     IsSuccess = true,
                     Message = "The Book is deleted from the cart successfully.",
                     Data = _mapper.Map<CartBooksDto>(check)
-            };
+                };
 
             }
             catch (Exception ex)
@@ -187,10 +190,173 @@ namespace Shopping.Services
 
 
         }
-        
-        public Task<GeneralResponse<List<CartDto>>> Buying(int userId, int cartId)
+
+        public async Task<GeneralResponse<CartBooksDto>> EditOnNumOfCopies(int cartId, int bookId, AddDto dto)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var cart = await _context.Carts.FindAsync(cartId);
+                if (cart == null)
+                {
+                    return new GeneralResponse<CartBooksDto>
+                    {
+                        IsSuccess = false,
+                        Message = "No Cart found with this Id."
+                    };
+                }
+
+                var check = await _context.CartBooks.Where(n => n.cartId == cartId).SingleOrDefaultAsync(i => i.bookId == bookId);
+                if (check == null)
+                {
+                    return new GeneralResponse<CartBooksDto>
+                    {
+                        IsSuccess = false,
+                        Message = "No book found in your cart with this Id."
+                    };
+                }
+
+                var book = await _context.Books.FindAsync(bookId);
+                if(dto.wantedCopies > book.NumOfCopies || dto.wantedCopies <= 0)
+                {
+                    return new GeneralResponse<CartBooksDto>
+                    {
+                        IsSuccess = false,
+                        Message = "Num of wanted copies isnot available."
+                    };
+                }
+
+                check.WantedCopies = dto.wantedCopies;
+                cart.TotalPrice -= check.Price;
+
+                check.Price = dto.wantedCopies * book.Price;
+                cart.TotalPrice += check.Price;
+
+                _context.Carts.Update(cart);
+                _context.CartBooks.Update(check);
+                _context.SaveChanges();
+
+                return new GeneralResponse<CartBooksDto>
+                {
+                    IsSuccess = true,
+                    Message = "The number of wanted copies is changed successfully.",
+                    Data = _mapper.Map<CartBooksDto>(check)
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new GeneralResponse<CartBooksDto>
+                {
+                    IsSuccess = false,
+                    Message = "Something went wrong.",
+                    Error = ex
+                };
+            }
+
+        }
+
+
+        public async Task<GeneralResponse<List<CartBooksDto>>> Buying(int userId, int cartId)
+        {
+            try
+            {
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                {
+                    return new GeneralResponse<List<CartBooksDto>>
+                    {
+                        IsSuccess = false,
+                        Message = "No user found with this Id."
+                    };
+                }
+
+                var cart = await _context.Carts.SingleOrDefaultAsync(u => u.UserId == userId);
+                if (cart.Id != cartId)
+                {
+                    return new GeneralResponse<List<CartBooksDto>>
+                    {
+                        IsSuccess = false,
+                        Message = "Wrong Cart Id."
+                    };
+                }
+
+                
+
+                var cartbooks = await _context.CartBooks.Where(c => c.cartId == cartId).ToListAsync();
+                if (cartbooks == null)
+                {
+                    return new GeneralResponse<List<CartBooksDto>>
+                    {
+                        IsSuccess = false,
+                        Message = "The Cart is Empty."
+                    };
+                }
+                foreach (var cartbook in cartbooks)
+                {
+                    var book = await _context.Books.FindAsync(cartbook.bookId);
+                    if (book.NumOfCopies == 0)
+                    {
+                        var TheCart = await _context.Carts.FindAsync(cartbook.cartId);
+                        TheCart.TotalPrice = TheCart.TotalPrice - cartbook.Price;
+                        _context.CartBooks.Remove(cartbook);
+                        _context.SaveChanges();
+                        return new GeneralResponse<List<CartBooksDto>>
+                        {
+                            IsSuccess = false,
+                            Message = $"The book with this Id => {cartbook.bookId} is sold out."
+                        };
+
+                    }
+                    if (book.NumOfCopies < cartbook.WantedCopies)
+                    {
+                        return new GeneralResponse<List<CartBooksDto>>
+                        {
+                            IsSuccess = false,
+                            Message = $"The number of copies for the book with this Id => {cartbook.bookId} isnot available."
+                        };
+
+                    }
+                }
+
+                var bookUsers = cartbooks.Select(s => new BookUsers
+                {
+                    bookId = s.bookId,
+                    userId = userId
+                }).ToList();
+                await _context.bookUsers.AddRangeAsync(bookUsers);
+
+                foreach (var cartbook in cartbooks)
+                {
+                    var book = await _context.Books.FindAsync(cartbook.bookId);
+                    book.NumOfCopies = book.NumOfCopies - cartbook.WantedCopies;
+                    _context.Books.Update(book);
+                    _context.SaveChanges();
+                }
+                
+
+                cart.TotalPrice = 0;
+                _context.Carts.Update(cart);
+                var data = _mapper.Map<List<CartBooksDto>>(cartbooks);
+                _context.CartBooks.RemoveRange(cartbooks);
+                _context.SaveChanges();
+
+                return new GeneralResponse<List<CartBooksDto>>
+                {
+                    IsSuccess = true,
+                    Message = "The Process had been done successfully.",
+                    Data = data
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new GeneralResponse<List<CartBooksDto>>
+                {
+                    IsSuccess = false,
+                    Message = "Something went wrong.",
+                    Error = ex
+                };
+            }
         }
 
         

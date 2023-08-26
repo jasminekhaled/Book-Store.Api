@@ -222,7 +222,7 @@ namespace Shopping.Services
                 await dto.Poster.CopyToAsync(dataStream);
 
                 var book = _mapper.Map<Book>(dto);
-
+                 
                 book.Poster = dataStream.ToArray();
 
                 await _context.Books.AddAsync(book);

@@ -44,5 +44,23 @@ namespace Shopping.Controllers
                 return Ok(result);
             return BadRequest(result);
         }
+
+        [HttpPut("EditOnNumOfCopies")]
+        public async Task<IActionResult> EditOnNumOfCopies(int cartId, int bookId, AddDto dto)
+        {
+            var result = await _cartServices.EditOnNumOfCopies(cartId, bookId, dto);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
+        [HttpPut("Buying")]
+        public async Task<IActionResult> Buying(int userId, int cartId)
+        {
+            var result = await _cartServices.Buying(userId, cartId);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
     }
 }

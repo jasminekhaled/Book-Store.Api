@@ -9,6 +9,7 @@ namespace Shopping.Interfaces
         Task<GeneralResponse<CartDto>> AddToCart(int userId, int cartId, int bookId, AddDto dto);
         Task<GeneralResponse<CartBooksDto>> DeleteFromCart(int cartId, int bookId);
         Task<GeneralResponse<List<CartBooksDto>>> ListOfBooksInCart(int id);
-        Task<GeneralResponse<List<CartDto>>> Buying(int userId, int cartId);
+        Task<GeneralResponse<CartBooksDto>> EditOnNumOfCopies(int cartId, int bookId, AddDto dto);
+        Task<GeneralResponse<List<CartBooksDto>>> Buying(int userId, int cartId);
     }
 }
