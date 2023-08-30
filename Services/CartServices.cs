@@ -321,14 +321,17 @@ namespace Shopping.Services
                 var bookUsers = cartbooks.Select(s => new BookUsers
                 {
                     bookId = s.bookId,
-                    userId = userId
+                    userId = userId,
+                    Date = DateTime.Now,
+                    NumOfBoughtCopies = s.WantedCopies
                 }).ToList();
                 await _context.bookUsers.AddRangeAsync(bookUsers);
 
                 foreach (var cartbook in cartbooks)
                 {
                     var book = await _context.Books.FindAsync(cartbook.bookId);
-                    book.NumOfCopies = book.NumOfCopies - cartbook.WantedCopies;
+                    book.NumOfCopies -=  cartbook.WantedCopies;
+                    book.NumOfSoldCopies += cartbook.WantedCopies;
                     _context.Books.Update(book);
                     _context.SaveChanges();
                 }

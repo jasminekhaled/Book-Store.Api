@@ -1,13 +1,11 @@
-﻿using Shopping.Models.AuthModule;
-using Shopping.Models.CartModule;
+﻿using Shopping.Models.BookModule;
 using System.ComponentModel.DataAnnotations;
 
-namespace Shopping.Models.BookModule
+namespace Shopping.Dtos.StatisticsDtos.ResponseDtos
 {
-    public class Book
+    public class TopRatedDto
     {
-        public int Id { get; set; }
-
+        public int id { get; set; }
         [MaxLength(length: 200)]
         public string Title { get; set; }
 
@@ -19,12 +17,9 @@ namespace Shopping.Models.BookModule
         [MaxLength(length: 150)]
         public string Author { get; set; }
         public double Rate { get; set; }
-        public byte[] Poster { get; set; }
+        
         public int Year { get; set; }
-        public int NumOfSoldCopies { get; set; }
-        public List<BookCategories> bookCategories { get; set; }
-        public List<BookUsers> bookUsers { get; set; }
-        public List<CartBooks> cartBooks { get; set; }
-
+        public List<string> Categories { get; set; }
+        public byte[] Poster { get; set; }
     }
 }

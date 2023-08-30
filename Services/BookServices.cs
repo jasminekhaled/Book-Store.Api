@@ -527,9 +527,14 @@ namespace Shopping.Services
                 var bookUsers = new BookUsers
                 {
                     bookId = book.Id,
-                    userId = user.id
+                    userId = user.id,
+                    Date = DateTime.Now,
+                    NumOfBoughtCopies = dto.NumOfCopies
                 };
-                await _context.bookUsers.AddRangeAsync(bookUsers); 
+                await _context.bookUsers.AddRangeAsync(bookUsers);
+
+                book.NumOfSoldCopies += dto.NumOfCopies; 
+
 
                 _context.Books.Update(book);
                 _context.SaveChanges();

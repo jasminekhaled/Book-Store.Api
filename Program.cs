@@ -16,6 +16,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 builder.Services.AddScoped<IAuthServices, AuthServices>();
 builder.Services.AddScoped<IBookServices, BookServices>();
 builder.Services.AddScoped<ICartServices, CartServices>();
+builder.Services.AddScoped<IStatisticsServices, StatisticsServices>();
 builder.Services.AddAutoMapper(typeof(Program));
 var app = builder.Build();
 
